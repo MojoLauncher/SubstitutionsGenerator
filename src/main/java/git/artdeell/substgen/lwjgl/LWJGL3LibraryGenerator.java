@@ -9,10 +9,10 @@ import java.util.Set;
 
 public class LWJGL3LibraryGenerator extends LWJGLLibraryGenerator {
     private static final ClassifierDescription[] DESCRIPTIONS = new ClassifierDescription[] {
-            new ClassifierDescription("android-arm64", "natives-an-arm64", "natives-linux-arm64"),
-            new ClassifierDescription("android-arm",   "natives-an-arm32", "natives-linux-arm32"),
-            new ClassifierDescription("android-x86_64", "natives-an-x86_64", "natives-linux"),
-            new ClassifierDescription("android-x86",  "natives-an-x86", "natives-linux-x86")
+            new ClassifierDescription("android-arm",   "natives-linux-arm32", "natives-linux-arm32"),
+            new ClassifierDescription("android-x86",  "natives-linux-x86", "natives-linux-x86"),
+            new ClassifierDescription("android-x86_64", "natives-linux", "natives-linux"),
+            new ClassifierDescription("android-arm64", "natives-linux-arm64", "natives-linux-arm64"),
     };
     /**
      * @param repository the repo name in owner/name format

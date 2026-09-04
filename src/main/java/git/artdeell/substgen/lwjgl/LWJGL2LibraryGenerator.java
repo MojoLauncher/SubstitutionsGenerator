@@ -9,10 +9,10 @@ import java.util.Set;
 
 public class LWJGL2LibraryGenerator extends LWJGLLibraryGenerator {
     private static final ClassifierDescription[] DESCRIPTIONS = new ClassifierDescription[] {
-            new ClassifierDescription("android-arm64", "natives-an-arm64", "native-arm64-v8a"),
-            new ClassifierDescription("android-arm",   "natives-an-arm32", "native-armeabi-v7a"),
-            new ClassifierDescription("android-x86_64", "natives-an-x86_64", "native-x86"),
-            new ClassifierDescription("android-x86",  "natives-an-x86", "native-x86_64")
+            new ClassifierDescription("android-arm64", "natives-linux-arm64", "native-arm64-v8a"),
+            new ClassifierDescription("android-arm",   "natives-linux-arm32", "native-armeabi-v7a"),
+            new ClassifierDescription("android-x86_64", "natives-linux", "native-x86"),
+            new ClassifierDescription("android-x86",  "natives-linux-x86", "native-x86_64")
     };
 
     public LWJGL2LibraryGenerator(String version, String repo, String tag) throws IOException, URISyntaxException {
