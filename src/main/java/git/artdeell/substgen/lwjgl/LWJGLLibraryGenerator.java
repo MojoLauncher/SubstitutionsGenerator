@@ -37,7 +37,7 @@ public abstract class LWJGLLibraryGenerator {
             if(classArtifact == null) continue;
             String className = description.classifierName();
             classMap.put(className, classArtifact);
-            nativeMap.put(className, description.classifierName());
+            nativeMap.put(description.platform(), className);
         }
 
         if(classMap.isEmpty()) return library;
