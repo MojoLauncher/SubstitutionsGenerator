@@ -13,6 +13,7 @@ import java.util.*;
 
 public class Main {
     private static final File versionsDir = new File("./allversions/");
+    private static final File extraVersionsDir = new File("./extra_versions/");
 
     private static final Map<String, ClientManifest.Library> substitutions = new HashMap<>();
     private static final Map<String, String> versionReplacements = new HashMap<>();
@@ -37,45 +38,54 @@ public class Main {
     public static void main(String[] args) throws Throwable {
         if(!versionsDir.exists() && !versionsDir.mkdirs()) throw new IOException("Failed to mkdirs");
 
+        versionReplacements.put("org.lwjgl:lwjgl:3.4.1:unsafe", "org.lwjgl:lwjgl:3.4.1");
+        versionReplacements.put("org.lwjgl:lwjgl:3.4.1-unsafe", "org.lwjgl:lwjgl:3.4.1");
+
         System.out.println("Downloading version manifest...");
         VersionManifest versionManifest = JSONParser.jsonFromUrl(VersionManifest.class, new URI("https://piston-meta.mojang.com/mc/game/version_manifest_v2.json").toURL());
 
         System.out.println("Preparing versions...");
         for(int i = 0; i < versionManifest.versions.length; i++) {
             VersionManifest.Download download = versionManifest.versions[i];
-
-            ClientManifest clientManifest = getFor(download);
-            for(ClientManifest.Library library : clientManifest.libraries) {
-                String libraryName = library.name;
-                if(!(libraryName.startsWith("org.lwjgl") || libraryName.contains("jinput-platform"))) continue;
-                if(library.rules != null && !(MoJsonRule.ruleSetCheck(library.rules).equals("allow"))) continue;
-                SubstitutionTarget target = new SubstitutionTarget(library);
-                processSubstitution(target);
-            }
+            processClientManifest(getFor(download));
             System.out.println(i+"/"+versionManifest.versions.length);
         }
-
-
+        for(File extraVersion : Objects.requireNonNull(extraVersionsDir.listFiles())) {
+            processClientManifest(JSONParser.jsonFromFile(ClientManifest.class, extraVersion));
+        }
 
         addLwjglModules();
 
         JSONParser.jsonToFile(new SubstitutionMap(substitutions, versionReplacements), new File("substitutions.json"));
     }
 
+    private static void processClientManifest(ClientManifest clientManifest) {
+        for(ClientManifest.Library library : clientManifest.libraries) {
+            String libraryName = library.name;
+            if(!(libraryName.startsWith("org.lwjgl") || libraryName.contains("jinput-platform"))) continue;
+            if(library.rules != null && !(MoJsonRule.ruleSetCheck(library.rules).equals("allow"))) continue;
+            SubstitutionTarget target = new SubstitutionTarget(library);
+            processSubstitution(target);
+        }
+    }
+
     private static void processSubstitution(SubstitutionTarget target) {
+        if(versionReplacements.containsKey(target.fullName)) return;
         if(target.provider.equals("org.lwjgl")) {
             String version = target.version;
             if(isLegacyLwjgl3(version)) {
                 versionReplacements.put(target.fullName, target.fullName.replace(target.version, oldestLwjgl3Version));
                 version = oldestLwjgl3Version;
             }
-            if(target.fullName.contains(":natives-")) {
+            if(target.fullName.contains(":natives-") || target.fullName.contains("-natives-")) {
                 disableLibrary(target);
             } else {
                 addLwjgl3Module(target.module, version);
             }
         } else if(target.provider.equals("org.lwjgl.lwjgl")) {
             versionReplacements.put(target.fullName, target.fullName.replace(target.version, lwjgl2Version));
+        }else if(target.module.equals("jinput-platform")) {
+            disableLibrary(target);
         }
     }
 
