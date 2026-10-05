@@ -21,7 +21,7 @@ public class Main {
 
     private static final String lwjgl2Version = "2.9.4-mojo";
     private static final String repoLwjgl2 = "MojoLauncher/lwjgl2-glfw";
-    private static final String tagLwjgl2 = "v7m";
+    private static final String tagLwjgl2 = "vv8m";
 
     private static final String tagFormat = "v%s-r6";
     private static final String repo = "MojoLauncher/unilwjgl3-builder";
